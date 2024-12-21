@@ -1,18 +1,17 @@
 use actix_identity::Identity;
-use actix_web::{HttpMessage, HttpRequest, HttpResponse, Responder, web};
-use actix_web::web::Data;
+use actix_web::{HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web::web::{Data, Json};
 use sqlx::MySqlPool;
-use crate::features::user::create::create_user_request_factory::create_from_payload;
-use crate::features::user::create::create_user_service::handle;
-use crate::payloads::create_user_payload::CreateUserPayload;
+use crate::features::auth::login::login_controller_request_factory::create_from_payload;
+use crate::features::auth::login::login_controller_service::handle;
+use crate::payloads::user_payload::UserPayload;
 
-pub async fn create_user_controller(
+pub async fn login_controller(
     pool: Data<MySqlPool>,
-    payload: web::Json<CreateUserPayload>,
+    payload: Json<UserPayload>,
     http_request: HttpRequest
 ) -> impl Responder {
-
-    match create_from_payload(payload){
+    match create_from_payload(payload) {
         Ok(request) => {
             match handle(pool, request).await {
                 Ok(user) => {
@@ -25,7 +24,7 @@ pub async fn create_user_controller(
                     HttpResponse::InternalServerError().json(
                         serde_json::json!({
                             "error": "Internal Server Error",
-                            "message": "Unable to create user"
+                            "message": "Unable to log"
                         })
                     )
                 }

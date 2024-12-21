@@ -27,3 +27,14 @@ pub fn get_select_by_id_query(
     sqlx::query_as::<_,User>(query)
         .bind(id)
 }
+
+pub fn get_select_by_email_query(
+    email: String
+) -> QueryAs<'static, sqlx::MySql, User, MySqlArguments> {
+    let query = r#"
+        SELECT * FROM users WHERE email LIKE ?
+    "#;
+    
+    sqlx::query_as::<_,User>(query)
+        .bind(email)
+}

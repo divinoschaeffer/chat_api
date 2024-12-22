@@ -1,6 +1,6 @@
-use serde::{Serialize, Serializer};
+use serde::{Deserialize, Serialize, Serializer};
 use serde::ser::SerializeStruct;
-#[derive(Debug, sqlx::FromRow, Clone)]
+#[derive(Debug, sqlx::FromRow, Clone, Deserialize)]
 pub struct User {
     #[sqlx(try_from = "i64")]
     pub id: Option<i64>,

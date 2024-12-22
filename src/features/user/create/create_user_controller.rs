@@ -23,20 +23,15 @@ pub async fn create_user_controller(
                         "token": token
                     }))
                 },
-                Err(_) => {
-                    HttpResponse::InternalServerError().json(
-                        serde_json::json!({
-                            "error": "Internal Server Error",
-                            "message": "Unable to create user"
-                        })
-                    )
+                Err(e) => {
+                    e.error_response()
                 }
             }
         },
         Err(payload_error) => {
             HttpResponse::BadRequest().json(
-                serde_json::json!({
-                    "error": "Invalid request",
+                json!({
+                    "success": "false",
                     "message": payload_error.to_string()
                 })
             )

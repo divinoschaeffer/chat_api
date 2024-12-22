@@ -22,13 +22,8 @@ pub async fn login_controller(
                         "token": token
                     }))
                 },
-                Err(_) => {
-                    HttpResponse::InternalServerError().json(
-                        json!({
-                            "error": "Internal Server Error",
-                            "message": "Unable to log"
-                        })
-                    )
+                Err(error) => {
+                    error.error_response()
                 }
             }
         },

@@ -22,7 +22,7 @@ pub fn routes() -> Scope {
                 .service(web::resource("/hello-world").route(web::get().to(hello)))
                 .service(
                     scope("/friend-request")
-                        //.wrap(from_fn(sender_middleware))
+                        .wrap(from_fn(sender_middleware))
                         .service(web::resource("").route(web::post().to(create_friendship_request_controller)))
                 )
         )

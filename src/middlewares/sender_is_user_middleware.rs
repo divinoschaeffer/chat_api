@@ -3,7 +3,7 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::{Error, HttpMessage};
 use actix_web::error::ErrorUnauthorized;
 use actix_web::middleware::Next;
-use actix_web::web::BytesMut;
+use actix_web::web::{BytesMut};
 use futures_util::StreamExt;
 use serde::Deserialize;
 use serde_json::json;
@@ -22,18 +22,17 @@ pub async fn sender_middleware(
 
     let mut body = BytesMut::new();
     let mut payload = req.take_payload();
-    let payload_copy = req.take_payload();
-    
+
     while let Some(chunk) = payload.next().await {
         body.extend_from_slice(&chunk?);
     }
-    
+
     let payload_data: PayloadData = serde_json::from_slice(&body)
         .map_err(|_| ErrorUnauthorized(json!({
             "success": "false",
             "message": "Access unauthorized"
         })))?;
-
+    
     // Vérifier les IDs
     if stored_user_id != Option::from(payload_data.sender_id) {
         return Err(ErrorUnauthorized(json!({
@@ -42,7 +41,9 @@ pub async fn sender_middleware(
         })));
     }
 
-    req.set_payload(payload_copy);
+    let (_, mut payload) = actix_http::h1::Payload::create(true);
+    payload.unread_data(body.into());
+    req.set_payload(payload.into());
 
     next.call(req).await
 }

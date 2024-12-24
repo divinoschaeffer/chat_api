@@ -19,13 +19,15 @@ pub async fn sender_middleware(
 ) -> Result<ServiceResponse<impl MessageBody>, Error> {
 
     let stored_user_id = req.extensions().get::<i64>().copied();
-    
+
     let mut body = BytesMut::new();
     let mut payload = req.take_payload();
+    let payload_copy = req.take_payload();
+    
     while let Some(chunk) = payload.next().await {
         body.extend_from_slice(&chunk?);
     }
-
+    
     let payload_data: PayloadData = serde_json::from_slice(&body)
         .map_err(|_| ErrorUnauthorized(json!({
             "success": "false",
@@ -40,6 +42,7 @@ pub async fn sender_middleware(
         })));
     }
 
+    req.set_payload(payload_copy);
 
     next.call(req).await
 }

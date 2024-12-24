@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS friendships (
 
 CREATE TABLE IF NOT EXISTS friendship_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    sender INT NOT NULL,
-    receiver INT NOT NULL,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
     date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (receiver) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );

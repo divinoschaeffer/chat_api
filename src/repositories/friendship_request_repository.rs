@@ -1,7 +1,7 @@
 use actix_web::web::Data;
 use sqlx::MySqlPool;
 use crate::models::friendship_request::FriendshipRequest;
-use crate::repositories::query_factories::friendship_request_query_factory::{get_insert_query, get_select_by_id_query, get_select_query};
+use crate::repositories::query_factories::friendship_request_query_factory::{get_delete_query, get_insert_query, get_select_by_id_query, get_select_query};
 
 pub async fn create(
     pool: &Data<MySqlPool>,
@@ -36,4 +36,14 @@ pub async fn get(
         friendship_request.receiver_id
     );
     query.fetch_optional(pool.as_ref()).await
+}
+
+pub async fn delete(
+    pool: &Data<MySqlPool>,
+    id: i64
+) -> Result<(), sqlx::Error> {
+    let query = get_delete_query(id);
+    query.execute(pool.as_ref()).await?;
+    
+    Ok(())
 }

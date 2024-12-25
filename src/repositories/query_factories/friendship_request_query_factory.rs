@@ -41,3 +41,15 @@ pub fn get_select_by_id_query(
     sqlx::query_as::<_,FriendshipRequest>(query)
         .bind(id)
 }
+
+pub fn get_delete_query(
+    id: i64
+) -> Query<'static, sqlx::MySql, MySqlArguments> {
+    let query = r#"
+        DELETE FROM friendship_requests
+        WHERE id = ?
+    "#;
+    
+    sqlx::query(query)
+        .bind(id)
+}

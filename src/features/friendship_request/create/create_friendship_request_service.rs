@@ -1,3 +1,5 @@
+use actix_http::HttpMessage;
+use actix_web::HttpRequest;
 use actix_web::web::Data;
 use serde_json::json;
 use sqlx::MySqlPool;
@@ -6,9 +8,21 @@ use crate::models::friendship_request::FriendshipRequest;
 use crate::repositories::friendship_request_repository::{create, get};
 
 pub async fn handle(
+    req: HttpRequest,
     pool: Data<MySqlPool>,
     request: CreateFriendshipRequest
 ) -> Result<FriendshipRequest, actix_web::Error> {
+
+    let stored_user_id = req.extensions()
+        .get::<i64>()
+        .copied()
+        .unwrap();
+    if stored_user_id != request.sender_id {
+        return Err(actix_web::error::ErrorUnauthorized(json!({
+                    "success": "false",
+                    "message": "Mismatch user"
+                })));
+    }
     
     let friendship_request = FriendshipRequest {
         id: None,

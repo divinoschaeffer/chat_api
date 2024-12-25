@@ -4,6 +4,7 @@ use actix_web::web::scope;
 use crate::features::auth::login::login_controller::login_controller;
 use crate::features::friendship_request::accept::accept_friendship_request_controller::accept_friendship_request_controller;
 use crate::features::friendship_request::create::create_friendship_request_controller::create_friendship_request_controller;
+use crate::features::friendship_request::decline::decline_friendship_request_controller::decline_friendship_request_controller;
 use crate::features::user::create::create_user_controller::create_user_controller;
 use crate::middlewares::auth_middleware::Auth;
 
@@ -23,6 +24,7 @@ pub fn routes() -> Scope {
                     scope("/friend-request")
                         .service(web::resource("").route(web::post().to(create_friendship_request_controller)))
                         .service(web::resource("/accept/{friendship_request_id}").route(web::post().to(accept_friendship_request_controller)))
+                        .service(web::resource("/decline/{friendship_request_id}").route(web::delete().to(decline_friendship_request_controller)))
                 )
         )
 }

@@ -32,6 +32,7 @@ pub async fn handle(
                 } else {
                     let friend = Friendship {
                         id: None,
+                        friend_request_id: friend_request.id,
                         first_user_id: friend_request.sender_id,
                         second_user_id: friend_request.receiver_id,
                     };

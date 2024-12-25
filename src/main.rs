@@ -1,12 +1,15 @@
-use std::env;
-use actix_web::{App, get, HttpResponse, HttpServer, Responder, web};
-use sqlx::mysql::MySqlPoolOptions;
-use sqlx::MySqlPool;
+mod features;
+mod models;
+mod routes;
+mod repositories;
+mod payloads;
+mod middlewares;
+mod token;
 
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello Guys")
-}
+use std::env;
+use actix_web::{App, HttpServer, middleware, web};
+use sqlx::MySqlPool;
+use crate::routes::routes;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -30,7 +33,9 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
-            .service(hello)
+            .service(routes())
+            .wrap(middleware::NormalizePath::trim())
+            .wrap(middleware::Logger::default())
     })
         .bind(("127.0.0.1", 8080))?
         .workers(2)

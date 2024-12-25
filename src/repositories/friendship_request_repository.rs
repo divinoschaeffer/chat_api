@@ -7,15 +7,16 @@ pub async fn create(
     pool: &Data<MySqlPool>,
     friendship_request: FriendshipRequest
 ) -> Result<FriendshipRequest, sqlx::Error> {
+    let mut tx = pool.begin().await?;
     let query = get_insert_query(
         friendship_request.sender_id,
         friendship_request.receiver_id
     );
-    let result = query.execute(pool.as_ref()).await?;
+    let result = query.execute(&mut *tx).await?;
     
     let query = get_select_by_id_query(result.last_insert_id() as i64);
-    let request = query.fetch_one(pool.as_ref()).await?;
-    
+    let request = query.fetch_one(&mut *tx).await?;
+    tx.commit().await?;
     Ok(request)
 }
 
@@ -44,6 +45,5 @@ pub async fn delete(
 ) -> Result<(), sqlx::Error> {
     let query = get_delete_query(id);
     query.execute(pool.as_ref()).await?;
-    
     Ok(())
 }

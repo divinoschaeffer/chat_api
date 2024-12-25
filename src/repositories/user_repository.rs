@@ -7,13 +7,13 @@ pub async fn create(
     pool: &Data<MySqlPool>,
     user: User
 ) -> Result<User, sqlx::Error> {
-
+    let mut tx = pool.begin().await?;
     let query = get_insert_query(user.clone());
-    let result = query.execute(pool.as_ref()).await?;
+    let result = query.execute(&mut *tx).await?;
     
     let query = get_select_by_id_query(result.last_insert_id());
-    let user = query.fetch_one(pool.as_ref()).await?;
-
+    let user = query.fetch_one(&mut *tx).await?;
+    tx.commit().await?;
     Ok(user)
 }
 

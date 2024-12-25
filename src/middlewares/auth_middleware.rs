@@ -1,7 +1,7 @@
 use std::env;
 use std::future::{ready, Ready};
 
-use actix_web::{dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform}, Error, HttpResponse};
+use actix_web::{dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform}, Error, HttpMessage, HttpResponse};
 use actix_web::body::EitherBody;
 use futures_util::future::LocalBoxFuture;
 use futures_util::FutureExt;
@@ -59,7 +59,8 @@ where
                         &DecodingKey::from_secret(private_key.as_bytes()),
                         &Validation::default(),
                     ) {
-                        Ok(_) => {
+                        Ok(token) => {
+                            req.extensions_mut().insert::<i64>(token.claims.user_id.clone());
                             let res = self.service
                                 .call(req)
                                 .boxed_local();

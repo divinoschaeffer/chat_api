@@ -9,6 +9,12 @@ pub struct User {
     pub password: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserDTO {
+    pub id: Option<i64>,
+    pub name: String,
+}
+
 impl Serialize for User {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

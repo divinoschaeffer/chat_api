@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, Responder, web};
+use actix_web::{HttpRequest, HttpResponse, Responder, web};
 use actix_web::web::Data;
 use serde_json::json;
 use sqlx::MySqlPool;
@@ -8,13 +8,14 @@ use crate::features::friendship_request::create::create_friendship_request_servi
 use crate::payloads::create_friendship_request_payload::CreateFriendshipRequestPayload;
 
 pub async fn create_friendship_request_controller(
+    req: HttpRequest,
     pool: Data<MySqlPool>,
     payload: web::Json<CreateFriendshipRequestPayload>
 ) -> impl Responder {
     
     match create_from_payload(payload) {
         Ok(request) => {
-            match handle(pool, request).await {
+            match handle(req, pool, request).await {
                 Ok(friend_request) => {
                     HttpResponse::Ok().json(friend_request)
                 },

@@ -21,10 +21,17 @@ pub fn routes() -> Scope {
                 .wrap(Auth)
                 .service(web::resource("/hello-world").route(web::get().to(hello)))
                 .service(
-                    scope("/friend-request")
-                        .service(web::resource("").route(web::post().to(create_friendship_request_controller)))
-                        .service(web::resource("/accept/{friendship_request_id}").route(web::post().to(accept_friendship_request_controller)))
-                        .service(web::resource("/decline/{friendship_request_id}").route(web::delete().to(decline_friendship_request_controller)))
+                    scope("/friend-requests")
+                        .service(web::resource("/create").route(web::post().to(create_friendship_request_controller)))
+                        .service(web::resource("/{friendship_request_id}/accept").route(web::post().to(accept_friendship_request_controller)))
+                        .service(web::resource("/{friendship_request_id}/decline").route(web::delete().to(decline_friendship_request_controller)))                     
+                )
+                .service(
+                    scope("/discussions")
+                        .service(
+                            scope("/messages")
+                                .service(web::resource("/create").route(web::post()))
+                        )
                 )
         )
 }
